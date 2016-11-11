@@ -1,4 +1,7 @@
 import { compute_crc } from './crc';
+
+export const SPORT_IDENT_VENDOR_ID = "0x10c4";
+
 /*
  * Basic protocol instructions
  */
