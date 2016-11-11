@@ -1,9 +1,10 @@
 /// <reference path="serialport.d.ts" />
 import * as SerialPort from 'serialport';
 
-import { buildWireMessage, BEEP, MSG_STARTUP_SEQUENCE, NAK, decodeWireMessage, SiMessage, SET_MASTER_MODE, SI_CARD_8_PLUS_DETECTED, GET_SI_CARD_8_PLUS_BN } from './si/codes';
+import { buildWireMessage, BEEP, MSG_STARTUP_SEQUENCE, NAK, decodeWireMessage, SiMessage, SET_MASTER_MODE, SI_CARD_8_PLUS_DETECTED, GET_SI_CARD_8_PLUS_BN, SI_CARD_5_DETECTED, GET_SI_CARD_5 } from './si/codes';
 import { Si8PlusDataFrame } from './dataframe/Si8PlusDataFrame';
 import * as moment from 'moment';
+import { Si5DataFrame } from './dataframe/Si5DataFrame';
 
 process.on('exit', () => {
     console.log('Exiting');
@@ -15,14 +16,13 @@ SerialPort.list((err, ports) => {
     ports.forEach(conf => {
         if (conf.vendorId === SPORT_IDENT_VENDOR_ID) {
             console.log(`${conf.comName} => ${conf.serialNumber}`);
-            const siPort = new SportIdentPort(conf.comName);
+            const siPort = new SportIdentPortReader(conf.comName);
             siPort.open();
         }
     })
 });
 
-
-class SportIdentPort {
+class SportIdentPortReader {
     private timeZero: number;
     private port: SerialPort;
     private onReceivedOpcode: Map<number, (WireMessage) => void> = new Map();
@@ -40,10 +40,24 @@ class SportIdentPort {
         this.onReceivedOpcode[SET_MASTER_MODE] = m => this.sendBeep(m);
         this.onReceivedOpcode[SI_CARD_8_PLUS_DETECTED] = m => this.onSiCard8PlusDetected(m);
         this.onReceivedOpcode[GET_SI_CARD_8_PLUS_BN] = m => this.onSiCard8PlusReadout(m);
+
+        this.onReceivedOpcode[SI_CARD_5_DETECTED] = m => this.onSiCard5Detected(m);
+        this.onReceivedOpcode[GET_SI_CARD_5] = m => this.onSiCard5Readout(m);
     }
+
+    public open() {
+        this.port.open();
+    }
+
     private runStartupSequence(): void {
         this.send(MSG_STARTUP_SEQUENCE);
     }
+
+    private onSiCard8PlusDetected(received?: SiMessage) {
+        console.log(`... SiCard8+ detected`);
+        this.send(buildWireMessage(GET_SI_CARD_8_PLUS_BN, 0)); // block number 0
+    }
+
     private onSiCard8PlusReadout(received?: SiMessage) {
         const blockNumber = received.params[2];
         //console.log(`SiCard8+ payload BN=${blockNumber}: ${received.payload.byteLength} bytes`);
@@ -57,9 +71,15 @@ class SportIdentPort {
             console.log(frame.debugString());
         }
     }
-    private onSiCard8PlusDetected(received?: SiMessage) {
-        console.log(`SiCard8+ detected`);
-        this.send(buildWireMessage(GET_SI_CARD_8_PLUS_BN, 0)); // block number 0
+
+    private onSiCard5Detected(received?: SiMessage) {
+        console.log(`... SiCard5 detected`);
+        this.send(buildWireMessage(GET_SI_CARD_5));
+    }
+
+    private onSiCard5Readout(received?: SiMessage) {
+        let frame = new Si5DataFrame(received).startingAt(this.timeZero);
+        console.log(frame.debugString());
     }
     private sendBeep(received?: SiMessage) {
         const msg = buildWireMessage(BEEP, 0);
@@ -92,9 +112,5 @@ class SportIdentPort {
                 }
             }
         }
-    }
-
-    open() {
-        this.port.open();
     }
 }

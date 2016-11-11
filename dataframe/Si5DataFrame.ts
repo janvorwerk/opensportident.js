@@ -8,7 +8,8 @@ import { SiPunch } from './SiPunch';
 const SI5_TIMED_PUNCHES = 30;
 export class Si5DataFrame extends SiAbstractDataFrame {
 
-	public Si5DataFrame(message: SiMessage) {
+	public constructor(message: SiMessage) {
+		super();
 		this.dataFrame = this.extractDataFrame(message);
 		this.siNumber = this.extractSiNumber();
 	}
