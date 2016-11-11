@@ -1,0 +1,23 @@
+{
+  "name": "sportident",
+  "version": "0.1.0",
+  "description": "SportIdent(tm) reader",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "serial",
+    "sportident",
+    "si"
+  ],
+  "author": "Jan Vorwerk",
+  "license": "MIT",
+  "dependencies": {
+    "serialport": "^4.0.6"
+  },
+  "devDependencies": {
+    "@types/node": "^6.0.46",
+    "typescript": "^2.0.9"
+  }
+}
