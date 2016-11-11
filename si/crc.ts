@@ -1,7 +1,4 @@
 /**
- * Translation to TypeScript by Jan Vorwerk
- */
-/**
  * Released by SPORTident under the CC BY 3.0 license.
  * 
  * This work is licensed under the Creative Commons Attribution 3.0 Unported License.
@@ -9,10 +6,13 @@
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900,
  * Mountain View, California, 94041, USA.
  */
+/**
+ * Translation to Java by Simon Denier, then to TypeScript by Jan Vorwerk
+ */
 const POLY = 0x8005;
 const BITF = 0x8000;
 
-export function crc(buffer: Uint8Array): number {
+export function compute_crc(buffer: Uint8Array): number {
     let count = buffer.length;
     if (count < 2) {
         return 0;
@@ -22,9 +22,7 @@ export function crc(buffer: Uint8Array): number {
     tmp = (buffer[ptr++] << 8 | (buffer[ptr++] & 0xFF));
 
     if (count > 2) {
-        for (let i = Math.trunc(count / 2); i > 0; i--) // only even counts !!! and more
-        // than 4
-        {
+        for (let i = Math.trunc(count / 2); i > 0; i--) { // only even counts!!! and more than 4
             let val: number;
             if (i > 1) {
                 val = (buffer[ptr++] << 8 | (buffer[ptr++] & 0xFF));
