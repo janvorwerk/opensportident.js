@@ -41,9 +41,10 @@ export const MSG_STARTUP_SEQUENCE = new Uint8Array([WAKEUP, STX, STX, SET_MASTER
 
 const BASE_MESSAGE_LENGTH = 6; // STX, opcode, length, ..., crc1, crc0, ETX
 
-export class WireMessage {
+export class SiMessage {
     opcode: number;
     params?: number[];
+    payload: Uint8Array;
 
     debugString(): string {
         let ret = `{opcode: 0x${this.opcode.toString(16)}`;
@@ -60,7 +61,7 @@ export class WireMessage {
     }
 }
 
-export function decodeWireMessage(data: Uint8Array): WireMessage | null {
+export function decodeWireMessage(data: Uint8Array): SiMessage | null {
     if (data[0] !== STX) {
         console.log('Missing STX');
         return null;
@@ -74,13 +75,13 @@ export function decodeWireMessage(data: Uint8Array): WireMessage | null {
         console.log('Wrong length');
         return null;
     }
-    const expectedCrc = compute_crc(data.slice(1, data.length - 3));
+    const expectedCrc = compute_crc(data.subarray(1, data.length - 3));
     const receivedCrc = data[data.length - 3] << 8 | data[data.length - 2];
     if (expectedCrc !== receivedCrc) {
         console.log('Wrong CRC');
         return null;
     }
-    const ret: WireMessage = new WireMessage();
+    const ret: SiMessage = new SiMessage();
     ret.opcode = data[1]
     if (paramsLength) {
         ret.params = [];
@@ -88,6 +89,7 @@ export function decodeWireMessage(data: Uint8Array): WireMessage | null {
             ret.params[i] = data[3 + i];
         }
     }
+    ret.payload = data.subarray(3, data.length - 3);
     return ret;
 }
 
@@ -107,7 +109,7 @@ export function buildWireMessage(opcode: number, ...params: number[]): Uint8Arra
     for (let i = 0; i < params.length; i++) {
         ret[3 + i] = params[i] & 0xff;
     }
-    const c = compute_crc(ret.slice(1, size - 3));
+    const c = compute_crc(ret.subarray(1, size - 3));
     const c1 = c >> 8 & 0xff;
     const c0 = c & 0xff;
     ret[size - 3] = c1;
