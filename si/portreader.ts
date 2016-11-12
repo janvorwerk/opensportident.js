@@ -11,22 +11,32 @@ import {
 import { Si8PlusDataFrame } from '../dataframe/Si8PlusDataFrame';
 import { Si5DataFrame } from '../dataframe/Si5DataFrame';
 
+export interface SportIdentPortOptions {
+    timeZero?: number;
+    mute?: boolean;
+}
+
 export class SportIdentPortReader {
-    private timeZero: number;
     private port: SerialPort;
+    private options: SportIdentPortOptions;
+
     private onReceivedOpcode: Map<number, (WireMessage) => void> = new Map();
 
     private temp: SiMessage[];
 
-    constructor(portName: string, timeZero?: number) {
-        this.timeZero = timeZero ? timeZero : moment().startOf('day').valueOf();
+    constructor(portName: string, options?: SportIdentPortOptions) {
+        this.options = options || {};
+        if (!this.options.timeZero) {
+            this.options.timeZero = moment().startOf('day').valueOf();
+        }
         this.port = new SerialPort(portName, {
             baudRate: 38400,
             autoOpen: false
         });
         this.port.on('data', data => this.onDataReceived(data));
         this.port.on('open', () => this.runStartupSequence());
-        this.onReceivedOpcode[SET_MASTER_MODE] = m => this.sendBeep(m);
+        this.onReceivedOpcode[SET_MASTER_MODE] = m => this.ackConnection(m);
+
         this.onReceivedOpcode[SI_CARD_8_PLUS_DETECTED] = m => this.onSiCard8PlusDetected(m);
         this.onReceivedOpcode[GET_SI_CARD_8_PLUS_BN] = m => this.onSiCard8PlusReadout(m);
 
@@ -55,8 +65,9 @@ export class SportIdentPortReader {
             this.send(buildWireMessage(GET_SI_CARD_8_PLUS_BN, 1)); // block number 1
         }
         else {
+            this.beep(1);
             let msg = [...this.temp, received];
-            let frame = new Si8PlusDataFrame(msg).startingAt(this.timeZero);
+            let frame = new Si8PlusDataFrame(msg).startingAt(this.options.timeZero);
             console.log(frame.debugString());
         }
     }
@@ -67,12 +78,20 @@ export class SportIdentPortReader {
     }
 
     private onSiCard5Readout(received?: SiMessage) {
-        let frame = new Si5DataFrame(received).startingAt(this.timeZero);
+        this.beep(1);
+        let frame = new Si5DataFrame(received).startingAt(this.options.timeZero);
         console.log(frame.debugString());
     }
-    private sendBeep(received?: SiMessage) {
-        const msg = buildWireMessage(BEEP, 0);
-        this.send(msg);
+
+    private beep(count: number) {
+        if (count > 0 && !this.options.mute) {
+            const msg = buildWireMessage(BEEP, count);
+            this.send(msg);
+        }
+    }
+
+    private ackConnection(received?: SiMessage) {
+        this.beep(2);
     }
     private done(received?: SiMessage): void {
         //console.log('Done');

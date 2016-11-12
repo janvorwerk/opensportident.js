@@ -7,12 +7,13 @@ process.on('exit', () => {
     console.log('Exiting');
 });
 
+const MUTE = false; // when working at night...
 
 SerialPort.list((err, ports) => {
     ports.forEach(conf => {
         if (conf.vendorId === SPORT_IDENT_VENDOR_ID) {
             console.log(`${conf.comName} => ${conf.serialNumber}`);
-            const siPort = new SportIdentPortReader(conf.comName);
+            const siPort = new SportIdentPortReader(conf.comName, {mute: MUTE});
             siPort.open();
         }
     })
