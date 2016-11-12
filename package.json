@@ -1,10 +1,14 @@
 {
-  "name": "sportident",
+  "name": "opensportident",
   "version": "0.1.0",
-  "description": "SportIdent(tm) reader",
+  "description": "Open SPORTident(tm) JavaScript library",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angexis/opensportident.js.git"
   },
   "keywords": [
     "serial",
@@ -13,6 +17,10 @@
   ],
   "author": "Jan Vorwerk",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angexis/opensportident.js/issues"
+  },
+  "homepage": "https://github.com/angexis/opensportident.js",
   "dependencies": {
     "moment": "^2.16.0",
     "serialport": "^4.0.6"
