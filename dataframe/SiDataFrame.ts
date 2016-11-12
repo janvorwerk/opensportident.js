@@ -1,11 +1,8 @@
-import { SiPunch } from './SiPunch';
+import { SiPunch, SiReadout } from '../opensportident';
 
-export const NO_TIME = -1;
 export interface SiDataFrame {
 	startingAt(zerohour: number): SiDataFrame;
 	getSiSeries(): string;
-
-	getNbPunches(): number;
 
 	getSiNumber(): string;
 
@@ -17,5 +14,5 @@ export interface SiDataFrame {
 
 	getPunches(): SiPunch[];
 
-	debugString(): string;
+	extract(): SiReadout;
 }

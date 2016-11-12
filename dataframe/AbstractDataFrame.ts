@@ -3,8 +3,8 @@
  */
 import * as moment from 'moment';
 
-import { SiDataFrame, NO_TIME } from './SiDataFrame';
-import { SiPunch } from './SiPunch';
+import { SiDataFrame } from './SiDataFrame';
+import { SiPunch, NO_TIME, SiReadout } from '../opensportident';
 export abstract class AbstractDataFrame implements SiDataFrame {
 
 	protected siNumber: string;
@@ -36,33 +36,18 @@ export abstract class AbstractDataFrame implements SiDataFrame {
 		return this.checkTime;
 	}
 
-	public getNbPunches(): number {
-		return this.punches.length;
-	}
-
 	public getPunches(): SiPunch[] {
 		return this.punches;
 	}
 
-	public formatTime(timestamp: number): string {
-		if (timestamp === NO_TIME) {
-			return "no time";
-		} else {
-			return moment.utc(timestamp).format('ddd HH:mm:ss');
-		}
-	}
-
-	public debugString(): string {
-		const start = this.formatTime(this.getStartTime());
-		const finish = this.formatTime(this.getFinishTime());
-		const check = this.formatTime(this.getCheckTime());
-		const count = this.getPunches().length;
-		const indenting = '.'.repeat(this.getSiSeries().length);
-		let ret = `${this.getSiSeries()}: ${this.getSiNumber()} check(${check}) start(${start}) finish(${finish})\n ${indenting} ${count} punches:`;
-		for (let i = 0; i < count; i++) {
-			const punches = this.getPunches();
-			ret += ` ${i+1}:${punches[i].code}(${this.formatTime(punches[i].timestamp)})`;
-		}
+	public extract(): SiReadout {
+		const ret = new SiReadout();
+		ret.siCardSeries = this.getSiSeries();
+		ret.siCardNumber = this.getSiNumber();
+		ret.checkTimestampMs = this.getCheckTime();
+		ret.startTimestampMs = this.getStartTime();
+		ret.finishTimestampMs = this.getFinishTime();
+		ret.punches = this.punches;
 		return ret;
 	}
 }

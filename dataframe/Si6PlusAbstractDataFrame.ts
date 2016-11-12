@@ -1,7 +1,7 @@
 import { SiAbstractDataFrame, ONE_DAY, NO_SI_TIME, TWELVE_HOURS } from './SiAbstractDataFrame';
-import { SiMessage } from '../si/codes';
+import { SiMessage } from '../si/simessage';
 import { SiDataFrame } from './SiDataFrame';
-import { SiPunch } from './SiPunch';
+import { SiPunch } from '../opensportident';
 /**
  * Copyright (c) 2013 Simon Denier
  */
@@ -32,7 +32,7 @@ export abstract class Si6PlusAbstractDataFrame extends SiAbstractDataFrame {
 		this.punches = this.extractPunches(refTime);
 		if (this.punches.length > 0) {
 			let lastPunch = this.punches[this.punches.length - 1];
-			refTime = this.newRefTime(refTime, lastPunch.timestamp);
+			refTime = this.newRefTime(refTime, lastPunch.timestampMs);
 		}
 		this.finishTime = this.advanceTimePast(this.extractFinishTime(), refTime);
 		return this;

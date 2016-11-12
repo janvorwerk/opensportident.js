@@ -1,5 +1,5 @@
 import { AbstractDataFrame } from './AbstractDataFrame';
-import { NO_TIME } from './SiDataFrame';
+import { NO_TIME } from '../opensportident';
 /**
  * Copyright (c) 2013 Simon Denier
  */

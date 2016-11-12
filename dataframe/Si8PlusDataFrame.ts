@@ -1,6 +1,6 @@
 import { Si6PlusAbstractDataFrame } from './Si6PlusAbstractDataFrame';
-import { SiMessage } from '../si/codes';
-import { SiPunch } from './SiPunch';
+import { SiMessage } from '../si/simessage';
+import { SiPunch } from '../opensportident';
 /**
  * Copyright (c) 2013 Simon Denier
  */
@@ -27,7 +27,7 @@ export class Si8PlusDataFrame extends Si6PlusAbstractDataFrame {
 		this.siSeries = this.extractSiSeries();
 	}
 
-	protected extractSiSeries(): SiPlusSeries {
+	private extractSiSeries(): SiPlusSeries {
 		switch (this.byteAt(SINUMBER_PAGE) & 15) {
 			case 2:
 				return SERIES.SI8_SERIES;
@@ -69,7 +69,7 @@ export class Si8PlusDataFrame extends Si6PlusAbstractDataFrame {
 		for (let i = 0; i < punches.length; i++) {
 			let punchIndex = (punchesStart + i) * PAGE_SIZE;
 			let punchTime = this.advanceTimePast(this.extractFullTime(punchIndex), refTime);
-			punches[i] = { code: this.extractCode(punchIndex), timestamp: punchTime };
+			punches[i] = { controlCode: this.extractCode(punchIndex), timestampMs: punchTime };
 			refTime = this.newRefTime(refTime, punchTime);
 		}
 		return punches;

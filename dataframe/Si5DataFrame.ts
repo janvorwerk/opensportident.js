@@ -1,7 +1,7 @@
 import { SiAbstractDataFrame, TWELVE_HOURS } from './SiAbstractDataFrame';
-import { SiMessage } from '../si/codes';
-import { SiDataFrame, NO_TIME } from './SiDataFrame';
-import { SiPunch } from './SiPunch';
+import { SiMessage } from '../si/simessage';
+import { SiDataFrame } from './SiDataFrame';
+import { SiPunch, NO_TIME } from '../opensportident';
 /**
  * Copyright (c) 2013 Simon Denier
  */
@@ -32,7 +32,7 @@ export class Si5DataFrame extends SiAbstractDataFrame {
 		this.punches = this.computeShiftedPunches(refTime);
 		if (this.punches.length > 0) {
 			let lastTimedPunch = this.punches[this.nbTimedPunches(this.punches) - 1];
-			refTime = this.newRefTime(refTime, lastTimedPunch.timestamp);
+			refTime = this.newRefTime(refTime, lastTimedPunch.timestampMs);
 		}
 		this.finishTime = this.advanceTimePast(this.rawFinishTime(), refTime);
 		return this;
@@ -51,11 +51,11 @@ export class Si5DataFrame extends SiAbstractDataFrame {
 			// shift each punch time after the previous
 			let punchTime = this.advanceTimePast(this.getPunchTime(i), refTime);
 			let punchCode = this.getPunchCode(i);
-			punches[i] = { code: punchCode, timestamp: punchTime };
+			punches[i] = { controlCode: punchCode, timestampMs: punchTime };
 			refTime = this.newRefTime(refTime, punchTime);
 		}
 		for (let i = 0; i < nbPunches - SI5_TIMED_PUNCHES; i++) {
-			punches[i + SI5_TIMED_PUNCHES] = { code: this.getNoTimePunchCode(i), timestamp: NO_TIME };
+			punches[i + SI5_TIMED_PUNCHES] = { controlCode: this.getNoTimePunchCode(i), timestampMs: NO_TIME };
 		}
 		return punches;
 	}
