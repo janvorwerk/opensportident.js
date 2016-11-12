@@ -1,8 +1,7 @@
 # opensportident.js
 Open SPORTident JavaScript library.
 
-[SPORTident](https://www.sportident.com/) is a system to time your outdoor sport activities.
-See 
+[SPORTident](https://www.sportident.com/) is a system to time your outdoor sport activities. 
 
 ## Work in progress! Do not use yet besides experimentation
 
