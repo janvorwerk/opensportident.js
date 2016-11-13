@@ -21,7 +21,7 @@ export const BEEP = 0xF9;
  * Parameters for the GET_SYSTEM_VALUE command
  */
 export const GET_SYSTEM_VALUE_CPC = 0x74;
-export const GET_SYSTEM_VALUE_CARDBLOCKS = 0x33;
+export const GET_SYSTEM_VALUE_CARD6BLOCKS = 0x33;
 
 /**
  * Bitmask for the CPC field read by GET_SYSTEM_VALUE(0x74)
@@ -55,3 +55,22 @@ export const SI_CARD_10_PLUS_SERIES = 0x0F;
  */
 export const MSG_STARTUP_SEQUENCE = new Uint8Array([WAKEUP, STX, STX, SET_MASTER_MODE, 0x01, DIRECT_MODE, 0x6D, 0x0A, ETX]);
 
+
+export const DEBUG_MAP = {
+    0xFF: 'WAKEUP',
+    0x02: 'STX',
+    0x03: 'ETX',
+    0x06: 'ACK',
+    0x15: 'NAK',
+    0x83: 'GET_SYSTEM_VALUE',
+    0xF0: 'SET_MASTER_MODE',
+    0x4d: 'DIRECT_MODE',
+    0xF9: 'BEEP',
+    0xE5: 'SI_CARD_5_DETECTED',
+    0xE6: 'SI_CARD_6_PLUS_DETECTED',
+    0xE8: 'SI_CARD_8_PLUS_DETECTED',
+    0xE7: 'SI_CARD_REMOVED',
+    0xB1: 'GET_SI_CARD_5',
+    0xE1: 'GET_SI_CARD_6_BN',
+    0xEF: 'GET_SI_CARD_8_PLUS_BN'
+}

@@ -10,7 +10,7 @@ export declare class SiReadout {
     startTimestampMs: number;
     finishTimestampMs: number;
     punches: SiPunch[];
-    debugString(): string;
+    toDebugString(): string;
 }
 export interface SiPortId {
     comName: string;
@@ -20,6 +20,7 @@ export declare type SiEvent = 'open' | 'close' | 'readout' | 'error' | 'warning'
 export interface SiPortOptions {
     timeZero?: number;
     mute?: boolean;
+    debug?: boolean;
 }
 export declare class SiPortReader {
     constructor(portName: string, options?: SiPortOptions);

@@ -1,5 +1,5 @@
 /// <reference path="./serialport.d.ts" />
-import * as SerialPort from 'serialport';import { STX, ETX, SPORT_IDENT_VENDOR_ID } from './codes';
+import * as SerialPort from 'serialport';import { STX, ETX, SPORT_IDENT_VENDOR_ID, DEBUG_MAP, WAKEUP } from './codes';
 import { compute_crc } from './crc';
 import { SiPortId } from '../opensportident';
 
@@ -9,20 +9,6 @@ export class SiMessage {
     opcode: number;
     params?: number[];
     payload: Uint8Array;
-
-    debugString(): string {
-        let ret = `{opcode: 0x${this.opcode.toString(16)}`;
-        if (this.params) {
-            ret += ', params: [';
-            for (let i = 0; i < this.params.length; i++) {
-                const prefix = i ? ', ' : '';
-                ret += `${prefix}0x${this.params[i].toString(16)}(${this.params[i]})`;
-            }
-            ret += ']';
-        }
-        ret += '}';
-        return ret;
-    }
 }
 
 export function decodeWireMessage(data: Uint8Array): SiMessage | string {
@@ -75,5 +61,24 @@ export function buildWireMessage(opcode: number, ...params: number[]): Uint8Arra
     ret[size - 3] = c1;
     ret[size - 2] = c0;
     ret[size - 1] = ETX;
+    return ret;
+}
+
+export function toDebugString(buffer: Uint8Array): string {
+    let ret = '';
+    let index = 0;
+    for (index = 0; index < buffer.length; index++) {
+        let code = DEBUG_MAP[buffer[index]];
+        if (!code) {
+            code = ` 0x${buffer[index].toString(16)}`;
+        }
+        ret +=  ` ${code}`;
+        if (buffer[index] !== STX && buffer[index] !== WAKEUP) {
+            break;
+        }
+    }
+    for (index += 1; index < buffer.length; index++) {
+        ret += ` 0x${buffer[index].toString(16)}`;
+    }
     return ret;
 }

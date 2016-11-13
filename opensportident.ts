@@ -15,15 +15,15 @@ export class SiReadout {
 	finishTimestampMs: number;
 	punches: SiPunch[];
 
-	debugString(): string {
+	toDebugString(): string {
 		const start = this.formatTime(this.startTimestampMs);
 		const finish = this.formatTime(this.finishTimestampMs);
 		const check = this.formatTime(this.checkTimestampMs);
 		const count = this.punches.length;
-		const indenting = ' '.repeat(this.siCardSeries.length + 1);
+		// const indenting = ' '.repeat(this.siCardSeries.length + 1);
 		let ret = `${this.siCardSeries}: ${this.siCardNumber} check(${check}) start(${start}) finish(${finish})`;
 		for (let i = 0; i < count; i++) {
-			ret += `\n${indenting} - ${i<9?' ':''}${i + 1}:${this.punches[i].controlCode} ${this.formatTime(this.punches[i].timestampMs)}`;
+			ret += `\n    - ${i<9?' ':''}${i + 1}:${this.punches[i].controlCode} ${this.formatTime(this.punches[i].timestampMs)}`;
 		}
 		return ret;
 	}
