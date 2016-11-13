@@ -46,15 +46,34 @@ export const GET_SI_CARD_6_BN = 0xE1;
 export const GET_SI_CARD_8_PLUS_BN = 0xEF;
 
 /*
- * SiCard special data
+ * SiCard generation by SI number
+ * 
+ * SI3    SI2    SI1    SI0
+ * 00     07     A1     20          SI-Card 6
+ * 00     FF     00     00          SI-Card 6* (192 punches)
+ * 01     0F     42     40          SI-Card 9 (50 punches)
+ * 02     1E     84     80          SI-Card 8 (30 punches)
+ * 04     3D     09     00          pCard
+ * 06     5B     8D     80          tCard
+ * 0E     D5     9F     80          fCard
+ * 0F     6A     CF     C0          SI-Card 10
+ * 0F     7A     12     00          SIAC1
+ * 0F     89     54     40          SI-Card 11
  */
-export const SI_CARD_10_PLUS_SERIES = 0x0F;
-
+export const DATA_SI3_CARD_10_PLUS_SERIES = 0x0F;
+export const DATA_SI2_CARD_6_STAR_SERIES = 0xFF;
 /**
  * This is not built dynamically because of the weird WAKEUP first token
  */
 export const MSG_STARTUP_SEQUENCE = new Uint8Array([WAKEUP, STX, STX, SET_MASTER_MODE, 0x01, DIRECT_MODE, 0x6D, 0x0A, ETX]);
 
+/**
+ * The block numbers that need to be read
+ */
+export const BN_SICARD_8_9    = [0, 1];
+export const BN_SICARD_10PLUS = [0, 4, 6, 7];
+export const BN_SICARD_6      = [0, 6, 7];
+export const BN_SICARD_6_192  = [0, 6, 7, 2, 3, 4, 5]; // 1 contains personal data, not punches
 
 export const DEBUG_MAP = {
     0xFF: 'WAKEUP',

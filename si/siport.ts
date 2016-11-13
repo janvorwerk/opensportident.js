@@ -13,9 +13,11 @@ import { Si8PlusDataFrame } from '../dataframe/Si8PlusDataFrame';
 import { Si5DataFrame } from '../dataframe/Si5DataFrame';
 import { SiMessage, buildWireMessage, decodeWireMessage, toDebugString } from './simessage';
 import { SiPortId, SiEvent, SiPortDetectedMode } from '../opensportident';
-import { SI_CARD_REMOVED, GET_SI_CARD_6_BN, SI_CARD_6_PLUS_DETECTED, GET_SYSTEM_VALUE, GET_SYSTEM_VALUE_CPC, MASK_CPC_EXTENDED_PROTOCOL, MASK_CPC_AUTOSEND, GET_SYSTEM_VALUE_CARD6BLOCKS, SI_CARD_10_PLUS_SERIES, MASK_CPC_HANDSHAKE } from './codes';
+import { SI_CARD_REMOVED, GET_SI_CARD_6_BN, SI_CARD_6_PLUS_DETECTED, GET_SYSTEM_VALUE, GET_SYSTEM_VALUE_CPC,
+         MASK_CPC_EXTENDED_PROTOCOL, MASK_CPC_AUTOSEND, GET_SYSTEM_VALUE_CARD6BLOCKS, DATA_SI3_CARD_10_PLUS_SERIES, MASK_CPC_HANDSHAKE } from './codes';
 import { SiDataFrame } from '../dataframe/SiDataFrame';
 import { Si6DataFrame } from '../dataframe/Si6DataFrame';
+import { DATA_SI2_CARD_6_STAR_SERIES, BN_SICARD_6_192, BN_SICARD_6, BN_SICARD_10PLUS, BN_SICARD_8_9 } from './codes';
 
 export interface SiPortOptions {
     timeZero?: number;
@@ -33,6 +35,7 @@ export class SiPortReader {
     private baudRate: number;
 
     private isSiCard10Plus: boolean;
+    private isSiCard6Star: boolean;
     private temp: SiMessage[];
     private readCompleted: boolean;
 
@@ -96,20 +99,19 @@ export class SiPortReader {
     private onSiCardDetected(received: SiMessage) {
         this.readCompleted = false;
         this.isSiCard10Plus = false;
+        this.isSiCard6Star = false;
         this.temp = [];
 
         if (received.opcode === SI_CARD_5_DETECTED) {
             this.send(buildWireMessage(GET_SI_CARD_5));
         }
         else if (received.opcode === SI_CARD_6_PLUS_DETECTED) {
+            this.isSiCard6Star = received.params[3] === DATA_SI2_CARD_6_STAR_SERIES;
             this.send(buildWireMessage(GET_SI_CARD_6_BN, 0));
         }
         else if (received.opcode === SI_CARD_8_PLUS_DETECTED) {
-            // SiCard8 and SiCard9 have 2 blocks and need to be read explicitly
-            // Starting with SiCard10, you can send '8', which tells, send all the
-            // blocks as in the SiCard6. I could not find the doc for this
-            // discrimination byte but that's how Simon does it in GecoSI...
-            this.isSiCard10Plus = received.params[2] === SI_CARD_10_PLUS_SERIES;
+            // read the SI number most significant byte... 
+            this.isSiCard10Plus = received.params[2] >= DATA_SI3_CARD_10_PLUS_SERIES;
             this.send(buildWireMessage(GET_SI_CARD_8_PLUS_BN, 0));
         }
     }
@@ -123,15 +125,16 @@ export class SiPortReader {
     }
 
     private onSiCard6(received: SiMessage) {
-        this.handleChainedBlocks(received, this.si6CardBlocks, GET_SI_CARD_6_BN, (msg) => new Si6DataFrame(msg));
+        let bn = this.isSiCard6Star ? BN_SICARD_6_192 : this.si6CardBlocks;
+        this.handleChainedBlocks(received, bn, GET_SI_CARD_6_BN, (msg) => new Si6DataFrame(msg));
     }
 
     private onSiCard8Plus(received: SiMessage) {
         if (this.isSiCard10Plus) {
-            this.handleChainedBlocks(received, [0, 4, 6, 7], GET_SI_CARD_8_PLUS_BN, (msg) => new Si8PlusDataFrame(msg));
+            this.handleChainedBlocks(received, BN_SICARD_10PLUS, GET_SI_CARD_8_PLUS_BN, (msg) => new Si8PlusDataFrame(msg));
         }
         else {
-            this.handleChainedBlocks(received, [0, 1], GET_SI_CARD_8_PLUS_BN, (msg) => new Si8PlusDataFrame(msg));
+            this.handleChainedBlocks(received, BN_SICARD_8_9, GET_SI_CARD_8_PLUS_BN, (msg) => new Si8PlusDataFrame(msg));
         }
     }
 
@@ -199,10 +202,10 @@ export class SiPortReader {
                 cardBlocksByte = 0xc1;
             }
             if (cardBlocksByte === 0xc1) {
-                this.si6CardBlocks = [0, 6, 7];
+                this.si6CardBlocks = BN_SICARD_6;
             }
             else if (cardBlocksByte === 0xff) {
-                this.si6CardBlocks = [0, 6, 7, 2, 3, 4, 5]; // 1 contains personal data, not punches
+                this.si6CardBlocks = BN_SICARD_6_192;
             }
             else {
                 this.emit('error', `Unsupported SiCard6 cardblock mode: ${cardBlocksByte}`)
