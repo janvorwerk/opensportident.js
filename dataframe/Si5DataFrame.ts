@@ -46,7 +46,7 @@ export class Si5DataFrame extends SiAbstractDataFrame {
 
 	private computeShiftedPunches(startTime: number): SiPunch[] {
 		let nbPunches = this.rawNbPunches();
-		const punches: SiPunch[] = [];
+		const punches: SiPunch[] = new Array(nbPunches);
 		let nbTimedPunches = this.nbTimedPunches(punches);
 		let refTime = startTime;
 		for (let i = 0; i < nbTimedPunches; i++) {
@@ -82,8 +82,22 @@ export class Si5DataFrame extends SiAbstractDataFrame {
 		return this.timestampAt(0x19);
 	}
 
+	/**
+	 * The punch offset is computed according to the following table.
+	 * The 128 bytes block is coded here, where the offset in the buffer
+	 * is two digits: row<<8|column. For instance, RC in row=1, column=7
+	 * is found at buffer index 0x17.
+	 * NB: records are written starting at 1 here, while the code uses a
+	 * zero based index.
+	 * 		0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
+     *  0	x	CI6	CI5	CI4	CN1	CN0	CNS	0	WP	**	**	**	**	**	**	**
+     *  1	SB1	SN1	SN0	ST1	ST0	FT1	FT0	RC	SB2	CT1	CT0	SW	CNS	CS	FB	LB
+     *  2	31	1.1	1.2	1.3	2.1	2.2	2.3	3.1	3.2	3.3	4.1	4.2	4.3	5.1	5.2	5.3
+     *  3	32	6.1	6.2	6.3	7.1	7.2	7.3	8.1	8.2	8.3	9.1	9.2	9.3	...........
+	 *  ...... etc..... See developer manual
+	 */
 	protected punchOffset(i: number): number {
-		return 0x21 + (i / 5) * 0x10 + (i % 5) * 0x03;
+		return 0x21 + Math.trunc(i / 5) * 0x10 + (i % 5) * 0x03;
 	}
 
 	protected getPunchCode(i: number): number {
