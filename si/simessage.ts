@@ -7,7 +7,7 @@ const BASE_MESSAGE_LENGTH = 6; // STX, opcode, length, ..., crc1, crc0, ETX
 
 export class SiMessage {
     opcode: number;
-    params?: number[];
+    /** payload is the binary message excluding leading STX, opcode, length, and trailing CRC & ETX  */
     payload: Uint8Array;
 }
 
@@ -29,12 +29,7 @@ export function decodeWireMessage(data: Uint8Array): SiMessage | string {
     }
     const ret: SiMessage = new SiMessage();
     ret.opcode = data[1]
-    if (paramsLength) {
-        ret.params = [];
-        for (let i = 0; i < paramsLength; i++) {
-            ret.params[i] = data[3 + i];
-        }
-    }
+    // skip STX, opcode, length at the beginning and CRC1, CRC0 and ETX at the end
     ret.payload = data.subarray(3, data.length - 3);
     return ret;
 }

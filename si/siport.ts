@@ -58,8 +58,8 @@ export class SiPortReader {
         this.receivedOpcodeMap[SET_MASTER_MODE] = m => this.readConfig();
         this.receivedOpcodeMap[GET_SYSTEM_VALUE] = m => this.onConfig(m);
 
-        this.receivedOpcodeMap[BEEP] = () => { };
-        this.receivedOpcodeMap[SI_CARD_REMOVED] = () => this.temp = [];
+        this.receivedOpcodeMap[BEEP] = () => {};
+        this.receivedOpcodeMap[SI_CARD_REMOVED] = () => this.onSiCardRemoved();
 
         this.receivedOpcodeMap[SI_CARD_5_DETECTED] = (m) => this.onSiCardDetected(m);
         this.receivedOpcodeMap[GET_SI_CARD_5] = m => this.onSiCard5(m);
@@ -106,16 +106,16 @@ export class SiPortReader {
             this.send(buildWireMessage(GET_SI_CARD_5));
         }
         else if (received.opcode === SI_CARD_6_PLUS_DETECTED) {
-            this.isSiCard6Star = received.params[3] === DATA_SI2_CARD_6_STAR_SERIES;
+            this.isSiCard6Star = received.payload[3] === DATA_SI2_CARD_6_STAR_SERIES;
             this.send(buildWireMessage(GET_SI_CARD_6_BN, 0));
         }
         else if (received.opcode === SI_CARD_8_PLUS_DETECTED) {
             // read the SI number most significant byte... 
-            this.isSiCard10Plus = received.params[2] >= DATA_SI3_CARD_10_PLUS_SERIES;
+            this.isSiCard10Plus = received.payload[2] >= DATA_SI3_CARD_10_PLUS_SERIES;
             this.send(buildWireMessage(GET_SI_CARD_8_PLUS_BN, 0));
         }
     }
-    private onSiCardRemoved(received: SiMessage) {
+    private onSiCardRemoved() {
         if (!this.readCompleted) {
             this.emit('warning', 'SiCard removed too early');
         }
@@ -178,9 +178,9 @@ export class SiPortReader {
     }
 
     private onConfig(received: SiMessage) {
-        const conf = received.params[2];
-        if (conf === GET_SYSTEM_VALUE_CPC) {
-            const cpc = received.params[3];
+        const configZone = received.payload[2];
+        if (configZone === GET_SYSTEM_VALUE_CPC) {
+            const cpc = received.payload[3];
             if (!(cpc & MASK_CPC_EXTENDED_PROTOCOL)) {
                 this.emit('error', 'Station should be setup in extended protocol');
             }
@@ -195,8 +195,8 @@ export class SiPortReader {
             const msg = buildWireMessage(GET_SYSTEM_VALUE, GET_SYSTEM_VALUE_CARD6BLOCKS);
             this.send(msg);
         }
-        else if (conf === GET_SYSTEM_VALUE_CARD6BLOCKS) {
-            let cardBlocksByte = received.params[3];
+        else if (configZone === GET_SYSTEM_VALUE_CARD6BLOCKS) {
+            let cardBlocksByte = received.payload[3];
             if (cardBlocksByte === 0x0) {
                 // For compatibility reasons CardBlocks = 0x00 is interpreted like CardBlocks = 0xC1 which addresses blocks 0,6,7
                 cardBlocksByte = 0xc1;
