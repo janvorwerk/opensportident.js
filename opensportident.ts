@@ -23,7 +23,7 @@ export class SiReadout {
 		const indenting = ' '.repeat(this.siCardSeries.length + 1);
 		let ret = `${this.siCardSeries}: ${this.siCardNumber} check(${check}) start(${start}) finish(${finish})`;
 		for (let i = 0; i < count; i++) {
-			ret += `\n${indenting} - ${i + 1}:${this.punches[i].controlCode} ${this.formatTime(this.punches[i].timestampMs)}`;
+			ret += `\n${indenting} - ${i<9?' ':''}${i + 1}:${this.punches[i].controlCode} ${this.formatTime(this.punches[i].timestampMs)}`;
 		}
 		return ret;
 	}
@@ -43,3 +43,8 @@ export interface SiPortId {
 }
 export type SiEvent = 'open' | 'close' | 'readout' | 'error' | 'warning';
 export { SiPortReader, listSiPorts } from './si/siport';
+
+export interface SiPortDetectedMode {
+	siCard6Punches: number;
+	baudRate: number;
+}

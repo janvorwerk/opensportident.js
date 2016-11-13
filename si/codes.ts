@@ -17,6 +17,19 @@ export const SET_MASTER_MODE = 0xF0;
 export const DIRECT_MODE = 0x4d;
 export const BEEP = 0xF9;
 
+/**
+ * Parameters for the GET_SYSTEM_VALUE command
+ */
+export const GET_SYSTEM_VALUE_CPC = 0x74;
+export const GET_SYSTEM_VALUE_CARDBLOCKS = 0x33;
+
+/**
+ * Bitmask for the CPC field read by GET_SYSTEM_VALUE(0x74)
+ */
+export const MASK_CPC_EXTENDED_PROTOCOL = 0x1;
+export const MASK_CPC_AUTOSEND = 0x2;
+export const MASK_CPC_HANDSHAKE = 0x4; // why two bits? isn't AUTOSEND the opposite of HANDSHAKE?
+
 /*
  * Card detected/removed
  */
@@ -35,10 +48,10 @@ export const GET_SI_CARD_8_PLUS_BN = 0xEF;
 /*
  * SiCard special data
  */
-export const SI3_NUMBER_INDEX = 5;
 export const SI_CARD_10_PLUS_SERIES = 0x0F;
 
 /**
  * This is not built dynamically because of the weird WAKEUP first token
  */
 export const MSG_STARTUP_SEQUENCE = new Uint8Array([WAKEUP, STX, STX, SET_MASTER_MODE, 0x01, DIRECT_MODE, 0x6D, 0x0A, ETX]);
+

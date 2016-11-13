@@ -1,11 +1,13 @@
+/**
+ * Copyright (c) 2013 Simon Denier
+ */
 import { SiAbstractDataFrame, TWELVE_HOURS } from './SiAbstractDataFrame';
 import { SiMessage } from '../si/simessage';
 import { SiDataFrame } from './SiDataFrame';
 import { SiPunch, NO_TIME } from '../opensportident';
-/**
- * Copyright (c) 2013 Simon Denier
- */
+
 const SI5_TIMED_PUNCHES = 30;
+
 export class Si5DataFrame extends SiAbstractDataFrame {
 
 	public constructor(message: SiMessage) {

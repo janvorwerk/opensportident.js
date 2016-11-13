@@ -13,7 +13,7 @@ listSiPorts((err, ports)  => {
 
             const siPort = new SiPortReader(portId.comName, {mute: false});
 
-            siPort.on('open', () => console.log(`Connected to ${portId.comName}`));
+            siPort.on('open', (mode) => console.log(`Connected to ${portId.comName} ${JSON.stringify(mode)})`));
             siPort.on('close', () => console.log(`Closed ${portId.comName} => ${portId.serialNumber}`));
             siPort.on('error', err => console.error(`Error on ${portId.comName}: ${err}`));
             siPort.on('warning', warn => console.warn(`Warning on ${portId.comName}: ${warn}`));

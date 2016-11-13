@@ -1,8 +1,8 @@
-import { AbstractDataFrame } from './AbstractDataFrame';
-import { NO_TIME } from '../opensportident';
 /**
  * Copyright (c) 2013 Simon Denier
  */
+import { AbstractDataFrame } from './AbstractDataFrame';
+import { NO_TIME } from '../opensportident';
 export const NO_SI_TIME = 1000 * 0xEEEE;
 export const TWELVE_HOURS = 1000 * 12 * 3600;
 export const ONE_DAY = 2 * TWELVE_HOURS;

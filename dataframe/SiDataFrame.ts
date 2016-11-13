@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2013 Simon Denier
+ */
 import { SiPunch, SiReadout } from '../opensportident';
 
 export interface SiDataFrame {
