@@ -74,4 +74,5 @@ SiCard 9: 1420154 check(Sun 14:19:20) start(Sun 14:24:07) finish(Sun 15:21:39)
 ```
 
 ## Origins
-The dataframe/ folder (the complex part) is a close translation of sdenier/GecoSI
+The ./dataframe/ folder (the most complex part dealing with the binary data reading)
+is a close translation of https://github.com/sdenier/GecoSI
