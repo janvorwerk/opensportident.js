@@ -1,4 +1,4 @@
-import { SiPortReader, SiReadout, listSiPorts, SiPortId } from './opensportident';
+import { SiPortReader, SiReadout, listSiPorts, SiPortId, SiPortDetectedMode } from './opensportident';
 
 listSiPorts((err, ports)  => {
     if (err) {
@@ -13,7 +13,7 @@ listSiPorts((err, ports)  => {
 
             const siPort = new SiPortReader(portId.comName, {mute: false, debug: false});
 
-            siPort.on('open', (mode) => console.log(`Connected to ${portId.comName} ${JSON.stringify(mode)})`));
+            siPort.on('open', (mode: SiPortDetectedMode) => console.log(`Connected to ${portId.comName} ${JSON.stringify(mode)})`));
             siPort.on('close', () => console.log(`Closed ${portId.comName} => ${portId.serialNumber}`));
             siPort.on('error', err => console.error(`Error on ${portId.comName}: ${err}`));
             siPort.on('warning', warn => console.error(`Warning on ${portId.comName}: ${warn}`));
