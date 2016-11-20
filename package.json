@@ -1,8 +1,9 @@
 {
   "name": "opensportident",
-  "version": "0.1.2",
+  "typings": "opensportident.d.ts",
+  "module": "opensportident.js",
+  "version": "0.1.3",
   "description": "Open SPORTident(tm) JavaScript library",
-  "main": "example.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
