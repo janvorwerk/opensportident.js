@@ -1,0 +1,8 @@
+.vscode/**
+node_modules/
+*.map
+**/*.ts
+!opensportident.d.ts
+!example.ts
+tsconfig.json
+.npmignore

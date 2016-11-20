@@ -6,11 +6,17 @@ Open SPORTident JavaScript library.
 This library can be used in NodeJS or in Electron. See 'serialport' NPM module for usage in Electron.
 
 ## Status
-It is currently tested with SiCard5, SiCard9 and SiCard10.
+It has been currently tested with:
+ * SiCard5,
+ * SiCard6,
+ * SiCard9 and
+ * SiCard10.
 
-Code for SiCard6 and SiCard6* is written but not tested yet! 
+### This lib is not production ready yet (unsufficiently tested) 
 
 ## Example
+
+The example is in TypesScript but you can use the lib in pure JavaScript of course.
 
 ```typescript
 import { SiPortReader, SiReadout, listSiPorts, SiPortId, SiPortDetectedMode } from 'opensportident';
